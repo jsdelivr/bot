@@ -1,16 +1,17 @@
+from twisted.internet import reactor
 from twisted.web.server import Site
 from twisted.web.resource import Resource
-from twisted.internet import reactor
 
 from blinker import signal
 
-import logging
-
 class Server(Resource):
     on_pr = signal("pull_event")
+    isLeaf = True
+    def render_GET(self, request):
+        print request
+        return "<html><body>What are you doin here buddy?</body></html>"
 
     def render_POST(self, request):
-        print request
         try:
             data = {
                 "number": request.args["number"],
@@ -22,9 +23,8 @@ class Server(Resource):
         return ""
 
 def start(port):
-    root = Resource()
-    root.putChild("form", Server())
-    factory = Site(root)
+    resource = Server()
+    factory = Site(resource)
     print "Booting server on port %d" % (port)
     reactor.listenTCP(port, factory)
     reactor.run()

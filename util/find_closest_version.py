@@ -2,15 +2,14 @@ def closest_version(haystack, needle, key):
     """
     Find the closest value to a given needle in a sorted ascending haystack
     """
-    if len(haystack) == 0: return None
-    if len(haystack) == 1: return haystack[0]
-    closest_idx = 0
+    if haystack and len(haystack) == 0: return None
+    closest_v = None
     closest_computed = None
-    for idx, item in enumerate(haystack):
+    for item in haystack:
         temp = key(item)
         if closest_computed is None or needle >= temp:
             closest_computed = temp
-            closest_idx = idx
+            closest_v = item
         else:
             break
-    return haystack[closest_idx]
+    return closest_v
