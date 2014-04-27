@@ -19,8 +19,7 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
     last_checked = 0
 
     def __init__(self):
-        auth = self.config["github"]
-        self.gh = login(auth["user"], token=auth["auth_token"])
+        self.gh = login(self.config["user"], token=self.config["auth_token"])
         self.repo = self.gh.repository(self.config["owner"], self.config["repo"])
 
     def rebase():
@@ -49,12 +48,12 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
 
         validation_state = True
 
-        # self.rebase()
         pr = self.get_pull(pr)
         if not pr:
             return False
 
         issue = self.repo.issue(pr.number)
+
         #megawac/jsdelivr
         owner_repo = "/".join(pr.head.repo)
 
@@ -128,9 +127,7 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
         for project_name,project in project_grouped.iteritems():
             version_issues += self.validate_version(project_name, project)
 
-        has_commented = any(c.user.login == self.config["github"]["user"] for c in issue.iter_comments())
-
-        if not has_commented and (warnings or ini_issues or code_issues or version_issues): #report them to the cops
+        if warnings or ini_issues or code_issues or version_issues: #report them to the cops
             data = {
                 "user": pr.user,
 
@@ -155,4 +152,5 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
             # with open("result.md", "w") as f:
             #     f.write(comments_md)
 
-            issue.create_comment(comments_md)
+            if not any(c.user.login == self.config["user"] for c in issue.iter_comments()):
+                issue.create_comment(comments_md)
