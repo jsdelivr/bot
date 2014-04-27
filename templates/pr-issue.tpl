@@ -13,7 +13,7 @@ Yo, alright @{{user.login}} thanks for the contibuting and everythin', but it se
     {{/info-issues}}
 {{/has-ini-issues}}
 {{#has-file-issues}}
-- Might be nothing but have some concerns about the files in your submission...  
+- Might be nothing but I have some concerns about the files in your submission...  
     {{#file-issues}}
     - {{.}}
     {{/file-issues}}

@@ -53,12 +53,23 @@ class INIValidator():
                 issues.append("where is the project's mainfile (*{1}*) in version *{0}*".format(version["version"], mainfile))
         return issues
 
-    def validate_ini(self, ini_data=None, changed_files=[], project_name=None):
+    def check_ini(self, repo, project_name):
+        files = requests.get("https://api.github.com/repos/{0}/contents/files/{1}".format(repo, project_name))
+        issues = []
+        for file in files.json():
+            if file["type"] == "file" and file["name"] != "info.ini":
+                issues.append("Unexpected file {path}".format(**file))
+        return issues
+
+    def validate_ini(self, ini_data=None, changed_files=[], project_name=None, owner_repo=None):
         if project_name is None:
             project_name = ini_data["project"].lower()
 
         existing_project = self.get_project(project_name)
         issues = []
+
+        if owner_repo:
+            issues += self.check_ini(owner_repo, project_name)
 
         if ini_data:
             try:
@@ -75,8 +86,9 @@ class INIValidator():
             return issues
 
         for key, val in ini.iteritems():
-            if ini_data and not (val.startswith("\"") and val.endswith("\"")):
-                issues.append("The {0} property should be wrapped in double quotes (i.e. {0} = \"{1}\")".format(key, val))
+            split = val.split("\"")
+            if ini_data and (len(split) != 3 or split[0] != "" or split[2] != ""):
+                issues.append("The {0} property should be wrapped in double quotes (i.e. {0} = \"{1}\") and contain no other double quotes".format(key, val))
 
             #not a known key?
             if key not in self.required_fields and key not in self.optional_fields:
@@ -108,4 +120,3 @@ class INIValidator():
         issues += self.validate_mainfile(ini["mainfile"].strip("\""), files=files)
 
         return issues
-

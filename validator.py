@@ -18,11 +18,6 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
     config = yaml.load(open("config.yml"))
     last_checked = 0
 
-    repo_path = "../jsdelivr"
-    branch = "master"
-
-    issue_template = open("templates/pr-issue.tpl").read()
-
     def __init__(self):
         auth = self.config["github"]
         self.gh = login(auth["user"], token=auth["auth_token"])
@@ -60,6 +55,8 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
             return False
 
         issue = self.repo.issue(pr.number)
+        #megawac/jsdelivr
+        owner_repo = "/".join(pr.head.repo)
 
         # collection of (<version>, <name>, <contents>)
         code_files = []
@@ -118,7 +115,7 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
         ini_issues = []
         for project_name,project in project_grouped.iteritems():
             checked[project_name] = True
-            ini_issues += self.validate_ini(ini_files.get(project_name, None), changed_files=project, project_name=project_name)
+            ini_issues += self.validate_ini(ini_files.get(project_name, None), changed_files=project, project_name=project_name, owner_repo=owner_repo)
 
         #ini file changed with no other files changed?
         for project,files in ini_files.iteritems():
@@ -131,9 +128,9 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
         for project_name,project in project_grouped.iteritems():
             version_issues += self.validate_version(project_name, project)
 
-        if warnings or ini_issues or code_issues or version_issues: #report them to the cops
-            # print warnings + ini_issues + code_issues + version_issues
+        has_commented = any(c.user.login == self.config["github"]["user"] for c in issue.iter_comments())
 
+        if not has_commented and (warnings or ini_issues or code_issues or version_issues): #report them to the cops
             data = {
                 "user": pr.user,
 
@@ -150,7 +147,9 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
                 "version-issues": version_issues
             }
 
-            comments_md = pystache.render(self.issue_template, data)
+            with open("templates/pr-issue.tpl") as f:
+                issue_template = f.read()
+            comments_md = pystache.render(issue_template, data)
 
             #debugging
             # with open("result.md", "w") as f:

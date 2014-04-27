@@ -30,8 +30,8 @@ class CodeValidator():
                     issues.append("Expression `{0}` had a match in the contents of *{name}* ({version}).".format(test, **file))
 
             #no comments... could be more sound by checking start
-            if not re.search(r"(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)", contents, re.MULTILINE):
-                issues.append("*{name}* ({version}) probably should start with a header detailing author and code source".format(**file))
+            # if not re.search(r"(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)", contents, re.MULTILINE):
+            #     issues.append("*{name}* ({version}) probably should start with a header detailing author and code source".format(**file))
 
         return issues
 
