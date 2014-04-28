@@ -149,7 +149,9 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
                 "warnings": warnings,
 
                 "has-version-issues": version_issues != [],
-                "version-issues": version_issues
+                "version-issues": version_issues,
+
+                "qotd": self.gh.zen()
             }
 
             with open("templates/pr-issue.tpl") as f:
