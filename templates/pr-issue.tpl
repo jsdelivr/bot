@@ -1,4 +1,4 @@
-Whooa, alright @{{login}} thanks for the contibuting and everythin', but it seems theres some issues you and me should sort out...
+It looks like you want to contribute to `jsdelivr/jsdelivr`, @{{login}}, however there seems to be some issues with your pull request. See [contributing](https://github.com/jsdelivr/jsdelivr#file-structure) for help ammending your PR...
 
 {{#has-warnings}}
 - Please see [contributing](https://github.com/jsdelivr/jsdelivr#file-structure) before fixing your PR...  
@@ -19,11 +19,11 @@ Whooa, alright @{{login}} thanks for the contibuting and everythin', but it seem
     {{/file-issues}}
 {{/has-file-issues}}
 {{#has-version-issues}}
-- There were some changes in some of the versions file structure from the previous version...  
+- We try to keep the file structure as consistent as possible between versions; there were some changes in file structure from previous versions...  
     {{#version-issues}}
     - {{{.}}}
     {{/version-issues}}
 {{/has-version-issues}}
 ----------
-<sup>Thanks again for contributing.. If you think this review was wrong/unfair/etc. submit a bug on [the bot's repo](https://github.com/jsdelivr/bot)</sup>
-{{qotd}}
+<sup>Thanks again for contributing.. If you think this review was wrong/unfair/etc. submit a bug on [the bot's repo](https://github.com/jsdelivr/bot)</sup>  
+*{{qotd}}*

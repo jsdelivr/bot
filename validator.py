@@ -104,7 +104,7 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
                     vgroup["files"].append(name)
 
                 if pr_file.deletions > 0: #the nerve
-                    warnings.append("wtf?! Why you touching the contents of *{0}*!".format(name))
+                    warnings.append("You appear to be changing the file contents of *{0}* in *{1}*!".format(name, version))
 
             elif ext == ".ini" and len(split_name) == 3:
                 ini_files[project] = data

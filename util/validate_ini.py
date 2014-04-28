@@ -50,7 +50,7 @@ class INIValidator():
         for version in files:
             if mainfile not in version["files"]:
                 # print mainfile, str(version["files"]), str(mainfile in list(version["files"]))
-                issues.append("where is the project's mainfile (*{1}*) in version *{0}*".format(version["version"], mainfile))
+                issues.append("Where is the project's mainfile (*{1}*) in version *{0}*".format(version["version"], mainfile))
         return issues
 
     def check_ini(self, repo, project_name, ref):
@@ -108,17 +108,13 @@ class INIValidator():
 
                 if "min" in validator:
                     if len(val) < validator["min"]:
-                        issues.append("{0} ('{1}') is to short".format(field, val))
+                        issues.append("{0} ('{1}') is too short".format(field, val))
                 if "max" in validator:
                     if len(val) > validator["max"]:
-                        issues.append("{0} ('{1}') is to short".format(field, val))
-
+                        issues.append("{0} ('{1}') is too long".format(field, val))
 
         #validate mainfile
-        if existing_project and "assets" in existing_project:
-            assets = existing_project["assets"]
-        else:
-            assets = []
+        assets = existing_project["assets"] if existing_project and "assets" in existing_project else []
 
         files = self.get_library_files(new_version=changed_files, old_versions=assets)
         issues += self.validate_mainfile(ini["mainfile"].strip("\""), files=files)
