@@ -103,7 +103,7 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
                 else:
                     vgroup["files"].append(name)
 
-                if pr_file.deletions > 0: #the nerve
+                if pr_file.status == "modified": #the nerve
                     warnings.append("You appear to be changing the file contents of *{0}* in *{1}*!".format(name, version))
 
             elif ext == ".ini" and len(split_name) == 3:
