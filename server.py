@@ -4,22 +4,27 @@ from twisted.web.resource import Resource
 
 from blinker import signal
 
+import json
+
 class Server(Resource):
     on_pr = signal("pull_event")
     isLeaf = True
     def render_GET(self, request):
-        print request
         return "<html><body>What are you doin here buddy?</body></html>"
 
     def render_POST(self, request):
         try:
+            parsed = json.loads(request.content.read())
+            data = {k: parsed[k] for k in ("number", "action")}
+        except Exception as e:
             data = {
-                "number": request.args["number"],
-                "action": request.args["action"]
+                "number": int(request.args.get("number", [""])[0]),
+                "action": str(request.args.get("action", [""])[0])
             }
+        try:
             self.on_pr.send(data)
-        except:
-            print "Failed to validate request\n\n"
+        except Exception, e:
+            print e
         return ""
 
 def start(port):

@@ -22,9 +22,6 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
         self.gh = login(self.config["user"], token=self.config["auth_token"])
         self.repo = self.gh.repository(self.config["owner"], self.config["repo"])
 
-    def rebase():
-        pass
-
     def get_project(self, project):
         data = requests.get("http://api.jsdelivr.com/v1/jsdelivr/libraries/{0}".format(project)).json()
         return data[0] if len(data) != 0 and type(data[0]) == dict else None
@@ -46,16 +43,18 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
     def validate(self, pr=None):
         self.repo.refresh()
 
-        validation_state = True
-
         pr = self.get_pull(pr)
         if not pr:
             return False
 
         issue = self.repo.issue(pr.number)
+        last_commit = pr.iter_commits().next()
+
+        self.repo.create_status(sha=last_commit.sha, state="pending")
 
         #megawac/jsdelivr
         owner_repo = "/".join(pr.head.repo)
+        ref = pr.head.ref
 
         # collection of (<version>, <name>, <contents>)
         code_files = []
@@ -105,7 +104,7 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
                     vgroup["files"].append(name)
 
                 if pr_file.deletions > 0: #the nerve
-                    warnings.append("Yo wtf why you be touching the contents of {0}".format(name))
+                    warnings.append("wtf?! Why you touching the contents of *{0}*!".format(name))
 
             elif ext == ".ini" and len(split_name) == 3:
                 ini_files[project] = data
@@ -114,14 +113,23 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
         ini_issues = []
         for project_name,project in project_grouped.iteritems():
             checked[project_name] = True
-            ini_issues += self.validate_ini(ini_files.get(project_name, None), changed_files=project, project_name=project_name, owner_repo=owner_repo)
+            try:
+                ini_issues += self.validate_ini(ini_files.get(project_name, None), changed_files=project, project_name=project_name, owner_repo=owner_repo, ref=ref)
+            except Exception as e:
+                ini_issues.append("Failed to validate {0}: {1}".format(project_name, str(e)))
 
         #ini file changed with no other files changed?
         for project,files in ini_files.iteritems():
             if project not in checked:
-                ini_issues += self.validate_ini(ini_data=files)
+                try:
+                    ini_issues += self.validate_ini(ini_data=files)
+                except Exception as e:
+                    ini_issues.append("Failed to validate {0}: {1}".format(project_name, str(e)))
 
-        code_issues = self.validate_code(code_files)
+        try:
+            code_issues = self.validate_code(code_files)
+        except Exception as e:
+            code_issues = [str(e)]
 
         version_issues = []
         for project_name,project in project_grouped.iteritems():
@@ -129,7 +137,7 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
 
         if warnings or ini_issues or code_issues or version_issues: #report them to the cops
             data = {
-                "user": pr.user,
+                "login": pr.user.login,
 
                 "has-ini-issues": ini_issues != [],
                 "info-issues": ini_issues,
@@ -152,5 +160,15 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
             # with open("result.md", "w") as f:
             #     f.write(comments_md)
 
+            #failure commit status
+            files = {"{0}.md".format(pr.number): {"content": comments_md}}
+            gist = self.gh.create_gist("Validation of PR #{0} for jsdelivr/jsdelivr".format(pr.number), files=files, public=False)
+            self.repo.create_status(sha=last_commit.sha, state="failure", target_url=gist.html_url, description="Failed automatic validation")
+
+            #create a comment if nothings happening
             if not any(c.user.login == self.config["user"] for c in issue.iter_comments()):
                 issue.create_comment(comments_md)
+        else:
+            #success status
+            self.repo.create_status(sha=last_commit.sha, state="success", description="LGTM")
+            

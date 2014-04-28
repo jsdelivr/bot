@@ -53,15 +53,16 @@ class INIValidator():
                 issues.append("where is the project's mainfile (*{1}*) in version *{0}*".format(version["version"], mainfile))
         return issues
 
-    def check_ini(self, repo, project_name):
-        files = requests.get("https://api.github.com/repos/{0}/contents/files/{1}".format(repo, project_name))
+    def check_ini(self, repo, project_name, ref):
+        url = "https://api.github.com/repos/{0}/contents/files/{1}?ref={2}".format(repo, project_name, ref)
+        print url
         issues = []
-        for file in files.json():
-            if file["type"] == "file" and file["name"] != "info.ini":
-                issues.append("Unexpected file {path}".format(**file))
+        for item in requests.get(url).json():
+            if item["type"] == "file" and item["name"] != "info.ini":
+                issues.append("Unexpected file {path}".format(**item))
         return issues
 
-    def validate_ini(self, ini_data=None, changed_files=[], project_name=None, owner_repo=None):
+    def validate_ini(self, ini_data=None, changed_files=[], project_name=None, owner_repo=None, ref=None):
         if project_name is None:
             project_name = ini_data["project"].lower()
 
@@ -69,7 +70,10 @@ class INIValidator():
         issues = []
 
         if owner_repo:
-            issues += self.check_ini(owner_repo, project_name)
+            try:
+                issues += self.check_ini(owner_repo, project_name, ref)
+            except:
+                pass
 
         if ini_data:
             try:
@@ -88,7 +92,7 @@ class INIValidator():
         for key, val in ini.iteritems():
             split = val.split("\"")
             if ini_data and (len(split) != 3 or split[0] != "" or split[2] != ""):
-                issues.append("The {0} property should be wrapped in double quotes (i.e. {0} = \"{1}\") and contain no other double quotes".format(key, val))
+                issues.append("The {0} property should be wrapped in double quotes (e.g. `{0} = \"{1}\"`) and contain no other double quotes".format(key, val))
 
             #not a known key?
             if key not in self.required_fields and key not in self.optional_fields:
