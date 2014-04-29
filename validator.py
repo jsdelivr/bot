@@ -35,8 +35,6 @@ class PullBot(PullValidator):
         status = PullValidator.validate(self, pr)
 
         if status.warnings or status.ini_issues or status.file_issues or status.version_issues: #report them to the cops
-            print "PR {0} failed to validate!".format(pr.number)
-
             data = {
                 "login": pr.user.login,
 
@@ -66,8 +64,9 @@ class PullBot(PullValidator):
             #failure commit status
             files = {"{0}.md".format(pr.number): {"content": comments_md}}
             gist = self.gh.create_gist("Validation of PR #{0} for jsdelivr/jsdelivr".format(pr.number), files=files, public=False)
-            state = "failure" if not status.error_occured else "error"
-            self.repo.create_status(sha=last_commit.sha, state=state, target_url=gist.html_url, description="Failed automatic validation")
+            state = "error" if status.error_occured else "failure"
+            message = "Automatic validation encountered an error" if status.error_occured else "Failed automatic validation"
+            self.repo.create_status(sha=last_commit.sha, state=state, target_url=gist.html_url, description=message)
 
             #create a comment if nothings happening
             if not any(c.user.login == self.config["user"] for c in issue.iter_comments()):

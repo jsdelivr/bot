@@ -21,10 +21,7 @@ class Server(Resource):
                 "number": int(request.args.get("number", [""])[0]),
                 "action": str(request.args.get("action", [""])[0])
             }
-        try:
-            self.on_pr.send(data)
-        except Exception, e:
-            print e
+        reactor.callInThread(self.on_pr.send, data) # self.on_pr.send(data)
         return ""
 
 def start(port):
