@@ -74,7 +74,7 @@ class INIValidator():
                 issues += self.check_ini(owner_repo, project_name, ref)
             except:
                 pass
-
+                
         if ini_data:
             try:
                 ini_data["contents"].decode("ascii")
