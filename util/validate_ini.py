@@ -90,9 +90,10 @@ class INIValidator():
             return issues
 
         for key, val in ini.iteritems():
-            split = val.split("\"")
-            if ini_data and (len(split) != 3 or split[0] != "" or split[2] != ""):
-                issues.append("The {0} property should be wrapped in double quotes (e.g. `{0} = \"{1}\"`) and contain no other double quotes".format(key, val))
+            if ini_data is not None:
+                split = val.split("\"")
+                if len(split) != 3 or split[0] != "" or split[2] != "":
+                    issues.append("The {0} property should be wrapped in double quotes (e.g. `{0} = \"{1}\"`) and contain no other double quotes".format(key, val))
 
             #not a known key?
             if key not in self.required_fields and key not in self.optional_fields:

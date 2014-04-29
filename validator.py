@@ -172,5 +172,5 @@ class PullBot(INIValidator, CodeValidator, VersionValidator):
                 issue.create_comment(comments_md)
         else:
             #success status
-            self.repo.create_status(sha=last_commit.sha, state="success", description="LGTM")
+            self.repo.create_status(sha=last_commit.sha, state="success", target_url="http://www.lgtm.in/g", description="LGTM")
             
