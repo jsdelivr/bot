@@ -24,6 +24,8 @@ class INIValidator():
         }
     }
 
+    unaccepted_status_codes = [301, 302, 303, 308, 500, 501] + range(400, 500)
+
     def get_library_files(self, new_version=[], old_versions=None):
         #merge by version
         versions = []
@@ -114,10 +116,21 @@ class INIValidator():
                     if len(val) > validator["max"]:
                         issues.append("{0} ('{1}') is too long".format(field, val))
 
+        #strip quotes
+        if ini_data:
+            ini = {k: v.strip("\"") for k, v in ini.iteritems()}
+
+        if ini["github"]:
+            if requests.get(ini["github"]).status_code in self.unaccepted_status_codes:
+                issues.append("Couldn't retrieve `github` website [{github}]({github})".format(**ini))
+        if ini["homepage"]:
+            if requests.get(ini["homepage"]).status_code in self.unaccepted_status_codes:
+                issues.append("Couldn't retrieve `homepage` website [{homepage}]({homepage})".format(**ini))
+
         #validate mainfile
         assets = existing_project["assets"] if existing_project and "assets" in existing_project else []
 
         files = self.get_library_files(new_version=changed_files, old_versions=assets)
-        issues += self.validate_mainfile(ini["mainfile"].strip("\""), files=files)
+        issues += self.validate_mainfile(ini["mainfile"], files=files)
 
         return issues
