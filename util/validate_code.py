@@ -5,13 +5,14 @@ TEXTCHARS = ''.join(map(chr, [7,8,9,10,12,13,27] + range(0x20, 0x100)))
 ALLBYTES = ''.join(map(chr, range(256)))
 
 def is_binary_string(bytes):
+    bytes = bytes[:1024] #hack patch #3
     if isinstance(bytes, unicode):
         bytes = bytes.encode("ascii", errors="ignore")
     return bool(bytes.translate(ALLBYTES, TEXTCHARS))
 
 
 class CodeValidator():
-    warn_statements = [r"\bprompt\(\b", "\balert\(\b", r"\bconfirm\(\b", r"document\.write"]
+    warn_statements = [r"\bprompt\(\b", r"\balert\(\b", r"\bconfirm\(\b", r"document\.write"]
 
     # true binary, false non binary
     valid_extensions = {
@@ -46,7 +47,7 @@ class CodeValidator():
                 continue
             elif is_binary_string(file["contents"]) != self.valid_extensions.get(file["extension"]):
                 msg = "to be binary content" if self.valid_extensions.get(file["extension"]) else "to not be binary content"
-                issues.append("Expected *{name} {0}".format(msg, **file))
+                issues.append("Expected *{name}* {0}".format(msg, **file))
                 continue
 
             if file["extension"] != ".js" and file["extension"] != ".css":
