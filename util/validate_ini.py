@@ -15,7 +15,7 @@ def read_ini(contents):
 class INIValidator():
 
     required_fields = ["author", "description", "mainfile"]
-    optional_fields = ["github", "homepage"]
+    optional_fields = ["github", "homepage", "mainfile2"]
 
     validators = {
         "author": {
@@ -45,19 +45,16 @@ class INIValidator():
 
         return versions
 
-    def validate_mainfile(self, mainfile, files=None):
-        if files is None:
-            files = self.get_library_files(library)
+    def validate_mainfile(self, mainfiles, files, project):
         issues = []
         for version in files:
-            if mainfile not in version["files"]:
+            if not any((mainfile in version["files"]) for mainfile in mainfiles):
                 # print mainfile, str(version["files"]), str(mainfile in list(version["files"]))
-                issues.append("Where is the project's mainfile (*{1}*) in version *{0}*".format(version["version"], mainfile))
+                issues.append("Where is the {2}'s mainfile (*{1}*) in v-*{version}*".format(version["version"], mainfile, project))
         return issues
 
     def check_ini(self, repo, project_name, ref):
         url = "https://api.github.com/repos/{0}/contents/files/{1}?ref={2}".format(repo, project_name, ref)
-        print url
         issues = []
         for item in requests.get(url).json():
             if item["type"] == "file" and item["name"] != "info.ini":
@@ -129,8 +126,9 @@ class INIValidator():
 
         #validate mainfile
         assets = existing_project["assets"] if existing_project and "assets" in existing_project else []
-
+        #https://github.com/jsdelivr/api/issues/33
+        mainfiles = [mainfile for key,mainfile in ini.iteritems() if key.startswith("mainfile")]
         files = self.get_library_files(new_version=changed_files, old_versions=assets)
-        issues += self.validate_mainfile(ini["mainfile"], files=files)
+        issues += self.validate_mainfile(mainfiles, files=files, project=project_name)
 
         return issues
