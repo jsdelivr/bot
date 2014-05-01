@@ -5,6 +5,8 @@ import pystache, yaml
 from github3 import login
 from github3.pulls import PullRequest
 
+from collections import deque
+
 class PullBot(PullValidator):
     config = yaml.load(open("config.yml"))
 
@@ -28,7 +30,7 @@ class PullBot(PullValidator):
             return False
 
         issue = self.repo.issue(pr.number)
-        last_commit = pr.iter_commits().next()
+        last_commit = deque(pr.iter_commits(), maxlen=1).pop()
 
         self.repo.create_status(sha=last_commit.sha, state="pending")
 
