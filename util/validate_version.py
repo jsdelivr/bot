@@ -10,15 +10,13 @@ class VersionValidator():
 
         if existing_project:
             assets = existing_project["assets"]
-            sorted(project_files, key=lambda p: p["version"])
-            sorted(assets, key=lambda p: p["version"])
             assets.reverse()
 
             #in case they added files to a version?
             computed = self.get_library_files(project_files, assets)
 
             for version in project_files:
-                closest = closest_version(assets, version["version"], key=lambda p: p["version"])
+                closest = closest_version(assets, version, key=lambda p: p["version"])
                 if closest:
                     comp = next(c for c in computed if c["version"] == version["version"])
                     new_files = []

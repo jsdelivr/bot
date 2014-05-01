@@ -96,7 +96,7 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator):
             checked[project_name] = True
             try:
                 ini_issues += self.validate_ini(ini_files.get(project_name, None), changed_files=project, project_name=project_name, owner_repo=owner_repo, ref=ref)
-            except Exception as e:
+            except Exception,e:
                 errored_out = True
                 ini_issues.append("Failed to validate {0}: {1}".format(project_name, str(e)))
 
@@ -105,23 +105,24 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator):
             if project not in checked:
                 try:
                     ini_issues += self.validate_ini(ini_data=files)
-                except Exception as e:
+                except Exception,e:
                     errored_out = True
                     ini_issues.append("Failed to validate {0}: {1}".format(project_name, str(e)))
 
         try:
             code_issues = self.validate_code(code_files)
-        except Exception as e:
+        except Exception,e:
             errored_out = True
             code_issues = [str(e)]
 
         version_issues = []
         for project_name,project in project_grouped.iteritems():
-            try:
-                version_issues += self.validate_version(project_name, project)
-            except:
-                errored_out = True
-                version_issues.append("Failed to validate {0}: {1}".format(project_name, str(e)))
+            version_issues += self.validate_version(project_name, project)
+            # try:
+            #     version_issues += self.validate_version(project_name, project)
+            # except Exception,e:
+            #     errored_out = True
+            #     version_issues.append("Failed to validate {0}: {1}".format(project_name, str(e)))
 
         result = {
             "ini_issues": ini_issues,

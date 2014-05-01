@@ -11,7 +11,7 @@ def is_binary_string(bytes):
 
 
 class CodeValidator():
-    warn_statements = [r"\bprompt\b", "\balert\b", r"\bconfirm\b", r"document\.write"]
+    warn_statements = [r"\bprompt\(\b", "\balert\(\b", r"\bconfirm\(\b", r"document\.write"]
 
     # true binary, false non binary
     valid_extensions = {
