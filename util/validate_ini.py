@@ -49,8 +49,7 @@ class INIValidator():
         issues = []
         for version in files:
             if not any((mainfile in version["files"]) for mainfile in mainfiles):
-                # print mainfile, str(version["files"]), str(mainfile in list(version["files"]))
-                issues.append("Where is the {2}'s mainfile (*{1}*) in v-*{version}*".format(version["version"], mainfile, project))
+                issues.append("Where is the {1}'s mainfile (*{0}*) in v-*{version}*".format(','.join(mainfiles), project, **version))
         return issues
 
     def check_ini(self, repo, project_name, ref):
@@ -127,7 +126,7 @@ class INIValidator():
         #validate mainfile
         assets = existing_project["assets"] if existing_project and "assets" in existing_project else []
         #https://github.com/jsdelivr/api/issues/33
-        mainfiles = [mainfile for key,mainfile in ini.iteritems() if key.startswith("mainfile")]
+        mainfiles = [mainfile for key,mainfile in ini.iteritems() if key.startswith("mainfile") and mainfile is not None]
         files = self.get_library_files(new_version=changed_files, old_versions=assets)
         issues += self.validate_mainfile(mainfiles, files=files, project=project_name)
 
