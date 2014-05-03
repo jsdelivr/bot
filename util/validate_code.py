@@ -10,6 +10,8 @@ def is_binary_string(bytes):
         bytes = bytes.encode("ascii", errors="ignore")
     return bool(bytes.translate(ALLBYTES, TEXTCHARS))
 
+comment_re = re.compile(r"(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)", re.MULTILINE)
+
 
 class CodeValidator():
     warn_statements = [r"\bprompt\(\b", r"\balert\(\b", r"\bconfirm\(\b", r"document\.write"]
@@ -55,7 +57,7 @@ class CodeValidator():
             
             if re.search(r"\bmin\b", file["name"]):
                 #warn if more than 10 lines in "minimized" file
-                if len(file["contents"].splitlines(True)) > 10:
+                if len(file["contents"].splitlines(True)) > 20:
                     issues.append("Is {name} ({version}) properly minimized?".format(**file))
 
             for test in self.warn_statements:
@@ -63,8 +65,13 @@ class CodeValidator():
                     issues.append("Expression `{0}` had a match in the contents of *{name}* ({version}).".format(test, **file))
 
             #no comments... could be more sound by checking start
-            # if not re.search(r"(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)", file["contents"], re.MULTILINE):
+            # if not comments_re.search(file["contents"]):
             #     issues.append("*{name}* ({version}) probably should start with a header detailing author and code source".format(**file))
+
+            try:
+                file["contents"].encode("ascii")
+            except UnicodeEncodeError,e:
+                issues.append("Unescaped unicode characters in *{name}* (at pos {0})".format(e.start, **file))
 
         return issues
 
