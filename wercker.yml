@@ -27,3 +27,14 @@ build:
         code: |
           echo "python version $(python --version) running"
           echo "pip version $(pip --version) running"
+deploy:
+    steps:
+        - script:
+            name: install af
+            code: sudo gem install af --version "0.3.18.12"
+        - script:
+            name: login to af
+            code: af login --email $AF_EMAIL --passwd $AF_PASSWORD
+        - script:
+            name: update af
+            code: af -u dakulovgr@gmail.com update jsdelivrbot
