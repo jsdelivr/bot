@@ -51,10 +51,10 @@ class CodeValidator():
                 continue
             elif file["contents"] is None:
                 if self.valid_extensions.get(file["extension"]) != True:
-                    issues.append("Expected *{name}* to be binary content".format(**file))
+                    issues.append("Expected *{name}* to be static content; found binary".format(**file))
                 continue #binary file
             elif self.valid_extensions.get(file["extension"]) != False:
-                issues.append("Expected *{name}* to be static content".format(**file))
+                issues.append("Expected *{name}* to be binary content; found text".format(**file))
                 continue
 
             if file["contents"].strip() == "":
