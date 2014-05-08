@@ -22,7 +22,7 @@ class PullBot(PullValidator):
         return None
 
     #validate a pr, pr is an int
-    def validate(self, pr=None):
+    def validate(self, pr=None, debug=False):
         self.repo.refresh()
 
         pr = self.get_pull(pr)
@@ -34,7 +34,7 @@ class PullBot(PullValidator):
 
         self.repo.create_status(sha=last_commit.sha, state="pending")
 
-        status = PullValidator.validate(self, pr)
+        status = PullValidator.validate(self, pr, debug)
 
         if status.warnings or status.ini_issues or status.file_issues or status.version_issues: #report them to the cops
             data = {
@@ -75,5 +75,5 @@ class PullBot(PullValidator):
                 issue.create_comment(comments_md)
         else:
             #success status
-            self.repo.create_status(sha=last_commit.sha, state="success", target_url="http://www.lgtm.in/g", description="LGTM")
+            self.repo.create_status(sha=last_commit.sha, state="success", target_url="http://www.lgtm.in/g", description="\"LGTM\" - bot")
             
