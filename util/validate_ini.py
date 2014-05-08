@@ -1,5 +1,6 @@
-import os
 import requests
+from ssl import SSLError
+from urlparse import urlparse
 
 #simple naive parser
 def read_ini(contents):
@@ -13,7 +14,6 @@ def read_ini(contents):
     return result
 
 class INIValidator():
-
     required_fields = ["author", "description", "mainfile"]
     optional_fields = ["github", "homepage", "mainfile2"]
 
@@ -68,15 +68,12 @@ class INIValidator():
         issues = []
 
         if owner_repo:
-            try:
-                issues += self.check_ini(owner_repo, project_name, ref)
-            except:
-                pass
+            issues += self.check_ini(owner_repo, project_name, ref)
                 
         if ini_data:
             try:
                 ini_data["contents"].decode("ascii")
-            except: # UnicodeDecodeError
+            except UnicodeError,e:
                 issues.append("`info.ini` for {project} contains non-ascii characters".format(**ini_data))
                 return issues
             ini = read_ini(ini_data["contents"])
@@ -117,11 +114,17 @@ class INIValidator():
             ini = {k: v.strip("\"") for k, v in ini.iteritems()}
 
         if ini["github"]:
-            if requests.get(ini["github"]).status_code in self.unaccepted_status_codes:
-                issues.append("Couldn't retrieve `github` website [{github}]({github})".format(**ini))
+            if urlparse(ini["github"]).netloc == "github.com":
+                if requests.get(ini["github"]).status_code in self.unaccepted_status_codes:
+                    issues.append("Couldn't retrieve `github` website [{github}]({github})".format(**ini))
+            else:
+                issues.append("*{github}* doesn't appear to be a `github` url".format(**ini))
         if ini["homepage"]:
-            if requests.get(ini["homepage"]).status_code in self.unaccepted_status_codes:
-                issues.append("Couldn't retrieve `homepage` website [{homepage}]({homepage})".format(**ini))
+            try:
+                if requests.get(ini["homepage"]).status_code in self.unaccepted_status_codes:
+                    issues.append("Couldn't retrieve `homepage` website [{homepage}]({homepage})".format(**ini))
+            except Exception, e:
+                issues.append(str(e))
 
         #validate mainfile
         assets = existing_project["assets"] if existing_project and "assets" in existing_project else []
