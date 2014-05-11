@@ -67,7 +67,7 @@ class INIValidator():
         existing_project = self.get_project(project_name)
         issues = []
 
-        if owner_repo:
+        if type(owner_repo) == str and len(owner_repo) > 3:
             issues += self.check_ini(owner_repo, project_name, ref)
                 
         if ini_data:

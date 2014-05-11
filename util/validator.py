@@ -67,7 +67,7 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator):
                 "extension": ext
             }
 
-            if not pr_file.filename.islower():
+            if not "/".join(split_name[:3]).islower():
                 warnings.append("*{0}* should be lowercase".format(pr_file.filename))
             if not valid_file_characters_re.match(pr_file.filename):
                 warnings.append("*{0}* contains illegal characters".format(pr_file.filename))
