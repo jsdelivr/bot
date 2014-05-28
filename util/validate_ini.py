@@ -80,8 +80,9 @@ class INIValidator():
         elif type(existing_project) is dict:
             fields = self.required_fields + self.optional_fields
             ini = {k: existing_project.get(k, None) for k in fields}
-        else:
-            issues.append("{0} has no *info.ini* file buddy".format())
+
+        if ini is None or len(ini) == 0:
+            issues.append("{0} has no *info.ini* file buddy".format(project_name))
             return issues
 
         for key, val in ini.iteritems():
