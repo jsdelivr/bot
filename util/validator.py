@@ -48,16 +48,22 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator):
         project_grouped = {}
 
         for pr_file in pr.iter_files():
-            split_name = pr_file.filename.split("/")
-
             if pr_file.changes != 0: #text based file
                 contents = requests.get(pr_file.raw_url).text
             else: #binary file
                 contents = None
-            ext = path.splitext(pr_file.filename)[1]
+
+            split_name = pr_file.filename.split("/")
+
+            if len(split_name) < 2:
+                continue
+            elif split_name[0] == "files" and len(split_name) == 2:
+                warnings.append("Files should exist under `files/<project>` not under `files`!")
+
+            project, version = split_name[1:3]
             name = "/".join(split_name[3:])
-            project = split_name[1]
-            version = split_name[2]
+
+            ext = path.splitext(pr_file.filename)[1]
 
             data = {
                 "contents": contents,
