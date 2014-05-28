@@ -14,7 +14,7 @@ comment_re = re.compile(r"(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)", re.
 
 
 class CodeValidator():
-    warn_statements = [r"\bprompt\(\b", r"\balert\(\b", r"\bconfirm\(\b", r"document\.write"]
+    warn_statements = [] #[r"\bprompt\(\b", r"\balert\(\b", r"\bconfirm\(\b", r"document\.write"]
 
     # true binary, false non binary
     valid_extensions = {
