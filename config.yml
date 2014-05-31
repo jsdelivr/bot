@@ -1,5 +1,9 @@
-repo: "jsdelivr"
-owner: "jsdelivr"
+repo: jsdelivr
+owner: jsdelivr
 
 user: jsdelivrbot
 auth_token: #token here
+
+merge_re: hey merge in (\d+) 
+
+path_to_repo: D:\Users\Dynomite\Documents\programming\extensions\jsdelivr
