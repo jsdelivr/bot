@@ -40,8 +40,9 @@ class GitMerger():
             remote = repo.create_remote("temp", "https://github.com/{0}/{1}.git".format(*pr.head.repo))
             repo.git.fetch(remote, pr.head.ref)
             #akin: git checkout -b temp-merge temp/<branch> --track
-            branch_name = "{0}/{1}".format(remote.name, pr.head.ref)
-            repo.git.checkout("temp-merge", branch_name, b=True, track=True)
+            branch_name = "{0}/{1}".format(pr.user.login, pr.head.ref)
+            branch_location = "{0}/{1}".format(remote.name, pr.head.ref)
+            repo.git.checkout(branch_name, branch_location, b=True, track=True)
             branch = repo.active_branch
 
             #soft reset/squash it
@@ -55,7 +56,7 @@ class GitMerger():
             repo.git.checkout("master")
             repo.git.merge(branch)
 
-            repo.remotes.origin.push()
+            repo.remotes.origin.push("master")
 
         except Exception,e:
             issue = self.repo.issue(pr.number)
