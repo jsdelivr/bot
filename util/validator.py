@@ -17,6 +17,8 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator):
     """
         Does the heavy lifting bringing together the components to validate a pr
     """
+    def __init__(self):
+        pass
 
     def get_project(self, project):
         """

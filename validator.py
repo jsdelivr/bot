@@ -1,6 +1,6 @@
 from util import PullValidator, GitMerger
 
-import pystache, yaml, re
+import pystache, yaml
 
 from github3 import login
 from github3.pulls import PullRequest
@@ -11,9 +11,11 @@ class PullBot(PullValidator, GitMerger):
     config = yaml.load(open("config.yml"))
 
     def __init__(self):
+        GitMerger.__init__(self)
+        PullValidator.__init__(self)
+
         self.gh = login(self.config["user"], token=self.config["auth_token"])
         self.repo = self.gh.repository(self.config["owner"], self.config["repo"])
-        self.merge_re = re.compile(self.config["merge_re"], re.IGNORECASE)
 
     def get_pull(self, pr=None):
         if type(pr) == int:
@@ -27,8 +29,7 @@ class PullBot(PullValidator, GitMerger):
         self.repo.refresh()
 
         pr = self.get_pull(pr)
-        if not pr:
-            return False
+        if not pr: return False
 
         issue = self.repo.issue(pr.number)
         last_commit = deque(pr.iter_commits(), maxlen=1).pop()
