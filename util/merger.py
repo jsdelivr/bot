@@ -7,17 +7,38 @@ class GitMerger():
     """
     def __init__(self):
         self.merge_re = re.compile(self.config["merge_re"], re.IGNORECASE)
+        self.rebase_re = re.compile("\brebase\b", re.IGNORECASE)
 
-    def should_merge(self, comment, requester):
-        return any(self.merge_re.match(line) for line in comment.splitlines()) and \
-            any(requester == collab.login for collab in self.repo.iter_collaborators())
+
+    def check_comment(self, number, comment, requester):
+        user = self.gh.user(requester)
+        lines = comment.splitlines()
+        print number
+        print requester
+        if any(self.merge_re.match(line) or self.rebase_re.match(line) for line in lines) and \
+            any(user == collab for collab in self.repo.iter_collaborators()) and \
+            any(comm.user == user and comm == comm.body for comm in self.repo.issue(number).iter_comments()):
+
+            if any(self.merge_re.match(line) for line in lines):
+                # merge(number, self.get_number_commits(comment))
+                pass
+            elif any(self.rebase_re.match(line) for line in lines):
+                rebase(number)
 
     def get_number_commits(self, comment):
         matches = [self.merge_re.match(line) for line in comment.splitlines()]
         match = next(match for match in matches if match is not None)
         return int(match.groups()[0])
 
-    def merge(self, number, requester, comment=""):
+    def rebase(self, number):
+        pr = self.get_pull(number)
+        issue = self.repo.issue(number)
+
+        with open("templates/rebase.tpl") as f:
+            msg = pystache.render(f.read(), pr)
+        issue.create_comment(msg)
+
+    def merge(self, number, commits):
         """
            Merge and squash the commits of a pull request if the requester is allowed
 
@@ -27,7 +48,6 @@ class GitMerger():
            @param requester str github login
            @param comment str check if comment is requesting a merge 
         """
-        if not self.should_merge(comment, requester): return False
         
         pr = self.get_pull(number)
         repo = Repo(self.config["path_to_repo"])
@@ -48,15 +68,17 @@ class GitMerger():
             #soft reset/squash it
             reset_commits = max(0, pr.commits - self.get_number_commits(comment))
             repo.git.reset("HEAD~{0}".format(reset_commits), soft=True)
+            repo.git.rebase("master")
 
             with open("templates/merge-pull-request.tpl") as f:
                 commit_msg = pystache.render(f.read(), pr)
-            repo.index.commit(commit_msg)
+                print commit_msg
+            # repo.index.commit(commit_msg)
 
-            repo.git.checkout("master")
-            repo.git.merge(branch)
+            # repo.git.checkout("master")
+            # repo.git.merge(branch)
 
-            repo.remotes.origin.push("master")
+            # repo.remotes.origin.push("master")
 
         except Exception,e:
             issue = self.repo.issue(pr.number)

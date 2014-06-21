@@ -4,29 +4,35 @@ from twisted.web.resource import Resource
 
 from blinker import signal
 
-import json
+import json, yaml
+
+from hashlib import sha1
+import hmac
+
+class AuthenticationException(Exception):
+    pass
 
 class Server(Resource):
     on_pr = signal("pull_event")
     on_comment = signal("comment_event")
     isLeaf = True
+    secret = yaml.load(open("config.yml"))["post_secret"]
+
     def render_GET(self, request):
         return "<html><body>What are you doin here buddy?</body></html>"
 
     def render_POST(self, request):
-        try:
-            parsed = json.loads(request.content.read())
-            print parsed
-            data = {k: v for k, v in parsed.iteritems()
-                            if k in ("issue", "comment", "number", "action")}
-        except Exception as e:
-            data = {
-                "issue": request.args.get("issue", [None])[0],
-                "number": int(request.args.get("number", ["-1"])[0]),
-                "comment": request.args.get("comment", [None])[0],
-                "action": str(request.args.get("action", [""])[0])
-            }
-            data = {k: v for k, v in data.iteritems() if v and v != -1}
+        body = request.content.read()
+        # msg = request.getHeader("X-Hub-Signature")[5:]
+
+        #http://pubsubhubbub.googlecode.com/svn/trunk/pubsubhubbub-core-0.3.html#authednotify
+        # hash = hmac.new(self.secret, msg, sha1)
+        # if hash.digest().decode("hex") != request.content.getvalue():
+        #     raise AuthenticationException("Could not identify")
+
+        parsed = json.loads(body)
+        data = {k: v for k, v in parsed.iteritems()
+                        if k in ("issue", "comment", "number", "action")}
 
         event = self.on_pr if "number" in data else self.on_comment
         reactor.callInThread(event.send, data) # self.on_pr.send(data)

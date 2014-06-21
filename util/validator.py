@@ -1,6 +1,7 @@
 from validate_ini import INIValidator
 from validate_code import CodeValidator
 from validate_version import VersionValidator
+from validate_update_json import UpdateJSONValidator
 
 from os import path
 import re
@@ -13,7 +14,7 @@ class ValidationState:
 
 valid_file_characters_re = re.compile(r"^[A-Za-z0-9.\-_/]+$")
 
-class PullValidator(INIValidator, CodeValidator, VersionValidator):
+class PullValidator(INIValidator, CodeValidator, VersionValidator, UpdateJSONValidator):
     """
         Does the heavy lifting bringing together the components to validate a pr
     """
@@ -41,6 +42,10 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator):
 
         # collection of (<version>, <name>, <contents>)
         code_files = []
+
+        # update.json files
+        update_files = []
+
         # in case multiple
         ini_files = {}
 
@@ -57,9 +62,9 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator):
 
             split_name = pr_file.filename.split("/")
 
-            if len(split_name) < 2:
+            if len(split_name) < 2 or split_name[0] != "files":
                 continue
-            elif split_name[0] == "files" and len(split_name) == 2:
+            elif len(split_name) == 2:
                 warnings.append("Files should exist under `files/<project>` not under `files`!")
 
             project, version = split_name[1:3]
@@ -80,7 +85,7 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator):
             if not valid_file_characters_re.match(pr_file.filename):
                 warnings.append("*{0}* contains illegal characters".format(pr_file.filename))
 
-            if split_name[0] == "files" and len(split_name) > 3:
+            if len(split_name) > 3:
                 code_files.append(data)
 
                 if project not in project_grouped:
@@ -101,6 +106,12 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator):
 
             elif ext == ".ini" and len(split_name) == 3:
                 ini_files[project] = data
+            elif ext == ".json" and len(split_name) == 3:
+                if name == "update":
+                    update_files.append(data)
+            else:
+                code_files.append("Unexpected file at {0}".format(pr.filename))
+
 
         checked = {}
         ini_issues = []
@@ -133,11 +144,13 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator):
         version_issues = []
         for project_name, project in project_grouped.iteritems():
             version_issues += self.validate_version(project_name, project)
-            # try:
-            #     version_issues += self.validate_version(project_name, project)
-            # except Exception,e:
-            #     errored_out = True
-            #     version_issues.append("Failed to validate {0}: {1}".format(project_name, str(e)))
+
+            try:
+                warnings += self.validate_tags(project_name, project, ini_files.get(project_name, None))
+            except: pass
+
+        for update_file in update_files:
+            self.check_update_file(update_file)
 
         result = {
             "ini_issues": ini_issues,

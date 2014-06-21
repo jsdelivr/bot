@@ -70,6 +70,7 @@ class INIValidator():
         if type(owner_repo) == str and len(owner_repo) > 3:
             issues += self.check_ini(owner_repo, project_name, ref)
                 
+        ini = None
         if ini_data:
             try:
                 ini_data["contents"].decode("ascii")

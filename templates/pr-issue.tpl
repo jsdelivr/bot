@@ -1,7 +1,7 @@
 It looks like you want to contribute to `jsdelivr/jsdelivr`, @{{login}}, however there seems to be some issues with your pull request. See [contributing](https://github.com/jsdelivr/jsdelivr#file-structure) for help ammending your PR...
 
 {{#has-warnings}}
-- Please see [contributing](https://github.com/jsdelivr/jsdelivr#file-structure) before fixing your PR...  
+- There are some fundamental issues with your PR :no_good:  
     {{#warnings}}
     - {{{.}}}
     {{/warnings}}
