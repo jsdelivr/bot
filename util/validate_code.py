@@ -79,7 +79,12 @@ class CodeValidator():
             try:
                 file["contents"].decode("ascii")
             except UnicodeError,e:
-                issues.append("Unescaped unicode characters in *{name}* (at pos {0})".format(e.start, **file))
+                # If not ascii try utf-8 encoding
+                try:
+                    file["contents"].decode("utf-8")
+                except UnicodeError,e:
+                    # If not utf-8 throw an issue out
+                    issues.append("Unescaped characters in *{name}* (at pos {0})".format(e.start, **file))
 
         return issues
 
