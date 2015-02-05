@@ -38,7 +38,8 @@ class PullBot(PullValidator, GitMerger):
 
         status = PullValidator.validate(self, pr, debug)
 
-        if status.warnings or status.ini_issues or status.file_issues or status.version_issues: #report them to the cops
+        if status.warnings or status.ini_issues or status.file_issues or status.version_issues:
+            #report them to the cops
             data = {
                 "login": pr.user.login,
 
@@ -61,10 +62,6 @@ class PullBot(PullValidator, GitMerger):
                 issue_template = f.read()
             comments_md = pystache.render(issue_template, data)
 
-            #debugging
-            # with open("result.md", "w") as f:
-            #     f.write(comments_md)
-
             #failure commit status
             files = {"{0}.md".format(pr.number): {"content": comments_md}}
             gist = self.gh.create_gist("Validation of PR #{0} for jsdelivr/jsdelivr".format(pr.number), files=files, public=False)
@@ -76,5 +73,11 @@ class PullBot(PullValidator, GitMerger):
             if not any(c.user.login == self.config["user"] for c in issue.iter_comments()):
                 issue.create_comment(comments_md)
         else:
-            #success status
+            #success status and attempt to merge it
             self.repo.create_status(sha=last_commit.sha, state="success", target_url="http://www.lgtm.in/g", description="\"LGTM\" - bot")
+            self.merge(pr)
+
+    def merge(self, pr):
+        # only merge trusted users
+        if pr.user.login in self.config["trusted_users"]:
+            pr.merge("http://www.lgtm.in/g")
