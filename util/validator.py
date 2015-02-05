@@ -110,7 +110,7 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator, UpdateJSONVal
                 if name == "update":
                     update_files.append(data)
             else:
-                code_files.append("Unexpected file at {0}".format(pr.filename))
+                code_files.append("Unexpected file at {0}".format(pr_file.filename))
 
 
         checked = {}
