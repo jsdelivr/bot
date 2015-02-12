@@ -1,0 +1,18 @@
+#!/usr/bin/python 
+
+from optparse import OptionParser
+import validator
+
+parser = OptionParser()
+parser.add_option("-v", "--verbose",
+                  action="store_false", dest="verbose", default=True,
+                  help="don't print status messages to stdout but to the pr")
+
+(options, args) = parser.parse_args()
+
+if len(args) == 1 and args[0].isdigit():
+    jimaek = validator.PullBot()
+    jimaek.validate(int(args[0]), options.verbose)
+    print 'LGTM'
+else:
+    print "Format: $ cli <pr> --verbose=false"
