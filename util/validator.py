@@ -107,8 +107,7 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator, UpdateJSONVal
             elif ext == ".ini" and len(split_name) == 3:
                 ini_files[project] = data
             elif ext == ".json" and len(split_name) == 3:
-                if name == "update":
-                    update_files.append(data)
+                update_files.append(data)
             else:
                 code_files.append("Unexpected file at {0}".format(pr_file.filename))
 
@@ -149,8 +148,8 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator, UpdateJSONVal
                 warnings += self.validate_tags(project_name, project, ini_files.get(project_name, None))
             except: pass
 
-        for update_file in update_files:
-            self.check_update_file(update_file)
+        for schema in update_files:
+            ini_issues += self.check_update_file(schema)
 
         result = {
             "ini_issues": ini_issues,
