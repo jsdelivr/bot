@@ -80,10 +80,9 @@ class PullBot(PullValidator, GitMerger):
     def merge(self, pr):
         # only merge trusted users
         if pr.user.login in self.config["trusted_users"]:
-            if pr.mergeable: pr.merge("http://www.lgtm.in/g")
-
             # Attempt to delete the branch (if the bot has permission for the repo)
             try:
+                pr.merge("http://www.lgtm.in/g")
                 # Until https://github.com/sigmavirus24/github3.py/pull/351 is sorted out
                 r = self.gh.repository(*pr.head.repo)
                 r.ref('heads/' + pr.head.ref).delete()
