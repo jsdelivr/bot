@@ -115,18 +115,20 @@ class INIValidator():
         if ini_data:
             ini = {k: v.strip("\"") for k, v in ini.iteritems()}
 
-        if ini["github"]:
+        if "github" in ini and ini["github"]:
             if urlparse(ini["github"]).netloc == "github.com":
                 if requests.get(ini["github"]).status_code in self.unaccepted_status_codes:
                     issues.append("Couldn't retrieve `github` website [{github}]({github})".format(**ini))
             else:
                 issues.append("*{github}* doesn't appear to be a `github` url".format(**ini))
-        if ini["homepage"]:
+        if "homepage" in ini:
             try:
                 if requests.get(ini["homepage"]).status_code in self.unaccepted_status_codes:
                     issues.append("Couldn't retrieve `homepage` website [{homepage}]({homepage})".format(**ini))
             except Exception, e:
                 issues.append(str(e))
+        else:
+            issues.append("Expected a `homepage` (this can be the source repo with docs)")
 
         #validate mainfile
         assets = existing_project["assets"] if existing_project and "assets" in existing_project else []
