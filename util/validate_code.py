@@ -36,6 +36,7 @@ class CodeValidator():
         ".eot": True,
         ".ttf": True,
         ".woff": True,
+        ".woff2": True,
 
         #etc
         ".svg": False,
