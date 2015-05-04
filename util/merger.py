@@ -1,4 +1,6 @@
-import pystache, re, subprocess
+import pystache, re
+from subprocess import call
+import os
 
 class GitMerger():
     """
@@ -36,13 +38,15 @@ class GitMerger():
         pr = self.get_pull(number)
 
         message = "%s\nCloses %d" % (pr.title, number)
-
-        output = subprocess.check_output(['./scripts/squash-and-merge.sh',
+        DEVNULL = open(os.devnull, 'r+b', 0)
+        
+        status = call(['./scripts/squash-and-merge.sh',
             self.config["path_to_repo"],
             self.config["repo_remote"],
             self.config["repo_branch"],
             str(number),
             message
-        ])
+        ], stdin=DEVNULL, stdout=DEVNULL, stderr=DEVNULL)
 
-        print output
+        if status != 200: #success
+            pr.create_comment("Sorry! I've failed you :(")

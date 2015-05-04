@@ -33,7 +33,6 @@ BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 git checkout $3
 git branch -D $BRANCH
 
-echo "still here"
-# git push $2 $3
-
+# Finish up
+git push $2 $3
 exit 200
