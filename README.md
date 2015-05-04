@@ -9,7 +9,7 @@ Couple reasons: we wanted something even faster than **@jimaek** (he usually too
 
 #### Why not travis/jenkins etc
 
-Could of be done, but it would have been slower to validate and be difficult to support issue comment hooks (actions when a mod wants a pr squashed).
+Could of be done, but it would have been slower to validate and be difficult to support issue comment hooks (actions when a mod wants a pr squashed) and auto merging.
 
 ### How
 
