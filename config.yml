@@ -5,7 +5,7 @@ user: jsdelivrbot
 auth_token: # token
 post_secret: # secret
 
-merge_re: "\s*@jsdelivrbot squash (and|&) merge\s*"
+merge_re: "@jsdelivrbot (.* )?squ[ia]sh.*"
 
 # For squash&merging
 path_to_repo: ~\jsdelivr
