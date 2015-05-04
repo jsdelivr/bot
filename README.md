@@ -17,6 +17,8 @@ Born out of a drunk weekend adventure to replace **@jimaek** with the github API
 
 ### Usage
 
+Note: squashing requires [`git-extras`](https://github.com/tj/git-extras)
+
 ```sh
 pip install -r requirements.txt
 ```

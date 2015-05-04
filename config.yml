@@ -5,10 +5,10 @@ user: jsdelivrbot
 auth_token: # token
 post_secret: # secret
 
-merge_re: hey merge in (\d+) 
+merge_re: "\s*@jsdelivrbot squash (and|&) merge\s*"
 
 path_to_repo: ~\jsdelivr
 
 # Users to auto merge prs from
 trusted_users:
-    - jsdelivrbot
+  - jsdelivrbot
