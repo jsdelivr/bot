@@ -7,7 +7,10 @@ post_secret: # secret
 
 merge_re: "\s*@jsdelivrbot squash (and|&) merge\s*"
 
+# For squash&merging
 path_to_repo: ~\jsdelivr
+repo_branch: master
+repo_upstream: origin
 
 # Users to auto merge prs from
 trusted_users:
