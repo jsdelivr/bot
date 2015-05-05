@@ -9,12 +9,6 @@ set -e
 
 # Requires git-extras (https://github.com/tj/git-extras)
 
-echo $1
-echo $2
-echo $3
-echo $4
-echo $5
-
 cd "$1"
 
 # Resync with remote

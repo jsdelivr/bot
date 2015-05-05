@@ -38,6 +38,9 @@ class GitMerger():
         pr = self.get_pull(number)
         issue = self.repo.issue(pr.number)
 
+        if pr.commits <= 1:
+            issue.create_comment("I'm afraid I can't do that.")
+            return
 
         message = "%s\nCloses #%d" % (pr.title, number)
         DEVNULL = open(os.devnull, 'r+b', 0)
@@ -52,4 +55,4 @@ class GitMerger():
         # ], stdin=DEVNULL, stdout=DEVNULL, stderr=DEVNULL)
 
         if status != 200: #success
-            pr.create_comment("Sorry! I've failed you :(")
+            issue.create_comment("Sorry! I've failed you :(")
