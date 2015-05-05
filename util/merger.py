@@ -12,12 +12,9 @@ class GitMerger():
     def check_comment(self, number, comment, requester):
         user = self.gh.user(requester)
         lines = comment.splitlines()
-        print number
-        print requester
         if any(self.merge_re.match(line) for line in lines) and \
             any(user == collab for collab in self.repo.iter_collaborators()):
-
-            self.squash_merge(number, self.get_number_commits(comment))
+            self.squash_merge(number)
 
     def rebase(self, number):
         pr = self.get_pull(number)

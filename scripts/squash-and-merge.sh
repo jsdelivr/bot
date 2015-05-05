@@ -34,5 +34,5 @@ git checkout $3
 git branch -D $BRANCH
 
 # Finish up
-# git push $2 $3
+git push $2 $3
 exit 200

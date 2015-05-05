@@ -23,6 +23,8 @@ Note: squashing requires [`git-extras`](https://github.com/tj/git-extras)
 pip install -r requirements.txt
 ```
 
+Adjust `config.yml` as necessary (tokens, user name, repo clone path, etc)
+
 Run server on port 9000
 ```sh
 ./run.py
