@@ -17,7 +17,7 @@ class GitMerger():
         if any(self.merge_re.match(line) for line in lines) and \
             any(user == collab for collab in self.repo.iter_collaborators()):
 
-            merge(number, self.get_number_commits(comment))
+            self.squash_merge(number, self.get_number_commits(comment))
 
     def rebase(self, number):
         pr = self.get_pull(number)
@@ -27,7 +27,7 @@ class GitMerger():
             msg = pystache.render(f.read(), pr)
         issue.create_comment(msg)
 
-    def merge(self, number):
+    def squash_merge(self, number):
         """
            Merge and squash the commits of a pull request if the requester is allowed
 
@@ -36,8 +36,10 @@ class GitMerger():
            @param number int pull number
         """
         pr = self.get_pull(number)
+        issue = self.repo.issue(pr.number)
 
-        message = "%s\nCloses %d" % (pr.title, number)
+
+        message = "%s\nCloses #%d" % (pr.title, number)
         DEVNULL = open(os.devnull, 'r+b', 0)
         
         status = call(['./scripts/squash-and-merge.sh',
@@ -46,7 +48,8 @@ class GitMerger():
             self.config["repo_branch"],
             str(number),
             message
-        ], stdin=DEVNULL, stdout=DEVNULL, stderr=DEVNULL)
+        ])
+        # ], stdin=DEVNULL, stdout=DEVNULL, stderr=DEVNULL)
 
         if status != 200: #success
             pr.create_comment("Sorry! I've failed you :(")

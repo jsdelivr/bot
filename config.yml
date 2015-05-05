@@ -2,15 +2,15 @@ repo: jsdelivr
 owner: jsdelivr
 
 user: jsdelivrbot
-auth_token: # token
+auth_token: # secret
 post_secret: # secret
 
 merge_re: "@jsdelivrbot (.* )?squ[ia]sh.*"
 
 # For squash&merging
-path_to_repo: ~\jsdelivr
+path_to_repo: /home/jsdelivr/
 repo_branch: master
-repo_upstream: origin
+repo_remote: origin
 
 # Users to auto merge prs from
 trusted_users:

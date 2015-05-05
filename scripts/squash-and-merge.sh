@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-## $1 is path
+## $1 is path to repo
 ## $2 is remote
 ## $3 is branch
 ## $4 is the pr number
@@ -9,7 +9,13 @@ set -e
 
 # Requires git-extras (https://github.com/tj/git-extras)
 
-cd $1
+echo $1
+echo $2
+echo $3
+echo $4
+echo $5
+
+cd "$1"
 
 # Resync with remote
 git fetch $2
@@ -34,5 +40,5 @@ git checkout $3
 git branch -D $BRANCH
 
 # Finish up
-git push $2 $3
+# git push $2 $3
 exit 200
