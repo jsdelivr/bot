@@ -11,6 +11,14 @@ set -e
 
 cd "$1"
 
+# Avoid past bugs
+{
+  git reset --hard
+  git rebase --abort
+} || {
+  echo "You're right!"
+}
+
 # Resync with remote
 git fetch $2
 git checkout $3
@@ -22,7 +30,7 @@ git rebase $3
 
 # Squash
 COUNT="$(git missing $3 | wc -l)"
-git reset --soft HEAD~$(expr $COUNT>0?$COUNT-1:0)
+git reset --soft HEAD~$(expr $COUNT - 1)
 git add -A
 git commit --amend -m "$5"
 
