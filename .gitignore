@@ -2,6 +2,8 @@ result.md
 #hide auth token :o
 config.yml
 
+*.out
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
