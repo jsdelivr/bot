@@ -28,6 +28,9 @@ Adjust `config.yml` as necessary (tokens, user name, repo clone path, etc)
 Run server on port 9000
 ```sh
 ./run.py
+
+#Background
+nohup ./run.py &
 ```
 
 ```sh
