@@ -65,7 +65,9 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator, UpdateJSONVal
             if len(split_name) < 2 or split_name[0] != "files":
                 continue
             elif len(split_name) == 2:
-                warnings.append("Files should exist under `files/<project>` not under `files`!")
+                warning = "File *{0}* should exist under `files/<project>/{0}` not under `files`!".format(pr_file.filename)
+                warnings.append(warning)
+                continue
 
             project, version = split_name[1:3]
             name = "/".join(split_name[3:])
