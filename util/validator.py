@@ -111,7 +111,7 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator, UpdateJSONVal
             elif ext == ".json" and len(split_name) == 3:
                 update_files.append(data)
             else:
-                code_files.append("Unexpected file at {0}".format(pr_file.filename))
+                warnings.append("Unexpected file, *{0}*".format(pr_file.filename))
 
 
         checked = {}
