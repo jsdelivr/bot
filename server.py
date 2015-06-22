@@ -23,12 +23,15 @@ class Server(Resource):
 
     def render_POST(self, request):
         body = request.content.read()
-        # msg = request.getHeader("X-Hub-Signature")[5:]
+
+        # Get hash (drop sha1=)
+        sig = request.getHeader("X-Hub-Signature")[5:]
 
         #http://pubsubhubbub.googlecode.com/svn/trunk/pubsubhubbub-core-0.3.html#authednotify
-        # hash = hmac.new(self.secret, msg, sha1)
-        # if hash.digest().decode("hex") != request.content.getvalue():
-        #     raise AuthenticationException("Could not identify")
+        hash = hmac.new(self.secret, request.content.getvalue(), sha1)
+        
+        if hash.digest().encode("hex") != sig:
+            raise AuthenticationException("Could not identify")
 
         parsed = json.loads(body)
         data = {k: v for k, v in parsed.iteritems()
