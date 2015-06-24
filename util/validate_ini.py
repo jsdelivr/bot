@@ -15,7 +15,7 @@ def read_ini(contents):
 
 class INIValidator():
     required_fields = ["author", "description", "mainfile"]
-    optional_fields = ["github", "homepage", "mainfile2"]
+    optional_fields = ["github", "homepage"]
 
     validators = {
         "author": {

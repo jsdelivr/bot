@@ -9,11 +9,10 @@ class GitMerger():
     def __init__(self):
         self.merge_re = re.compile(self.config["merge_re"], re.IGNORECASE)
 
-    def check_comment(self, number, comment, requester):
-        user = self.gh.user(requester)
+    def check_comment(self, number, comment, user):
         lines = comment.splitlines()
         if any(self.merge_re.match(line) for line in lines) and \
-            any(user == collab for collab in self.repo.iter_collaborators()):
+            self.repo.is_collaborator(user):
             self.squash_merge(number)
 
     def rebase(self, number):
