@@ -13,10 +13,11 @@ cd "$1"
 
 # Avoid past bugs
 {
+  git clean -xf
   git reset --hard
   git rebase --abort
 } || {
-  echo "You're right!"
+  echo "You are right git; we are not in a rebase!"
 }
 
 # Resync with remote
