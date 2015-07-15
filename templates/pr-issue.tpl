@@ -7,7 +7,7 @@ It looks like you want to contribute to `jsdelivr/jsdelivr`, @{{login}}, however
     {{/warnings}}
 {{/has-warnings}}
 {{#has-ini-issues}}
-- Looks like the `info.ini` has a few problems
+- Looks like the `info.ini` or `update.json` has some problems
     {{#info-issues}}
     - {{{.}}}
     {{/info-issues}}
