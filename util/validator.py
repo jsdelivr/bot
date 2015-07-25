@@ -12,7 +12,7 @@ class ValidationState:
     def __init__(self, **entries): 
         self.__dict__.update(entries)
 
-valid_file_characters_re = re.compile(r"^[A-Za-z0-9.\-_/]+$")
+valid_file_characters_re = re.compile(r"^[A-Za-z0-9.\-_/@]+$")
 
 class PullValidator(INIValidator, CodeValidator, VersionValidator, UpdateJSONValidator):
     """
