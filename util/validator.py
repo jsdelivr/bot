@@ -62,12 +62,13 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator, UpdateJSONVal
 
             split_name = pr_file.filename.split("/")
 
-            if len(split_name) < 2 or split_name[0] != "files":
-                continue
-            elif len(split_name) == 2:
-                warning = "File *{0}* should exist under `files/<project>/{0}` not under `files`!".format(pr_file.filename)
-                warnings.append(warning)
-                continue
+            if len(split_name) <= 2:
+                if len(split_name) == 1 and split_name[0].endswith(".md"):
+                    continue
+                else:
+                    warning = "File *{0}* should exist under `files/<project>/{0}`!".format(pr_file.filename)
+                    warnings.append(warning)
+                    continue
 
             project, version = split_name[1:3]
             name = "/".join(split_name[3:])
@@ -82,8 +83,9 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator, UpdateJSONVal
                 "extension": ext
             }
 
-            if not "/".join(split_name[:3]).islower():
-                warnings.append("*{0}* should be lowercase".format(pr_file.filename))
+            joined = "/".join(split_name[:3])
+            if not joined.islower():
+                warnings.append("*{0}* should be lowercase".format(joined))
             if not valid_file_characters_re.match(pr_file.filename):
                 warnings.append("*{0}* contains illegal characters".format(pr_file.filename))
 
