@@ -1,4 +1,5 @@
 import json
+from os import path
 
 class UpdateJSONValidator():
 
@@ -28,6 +29,10 @@ class UpdateJSONValidator():
                 elif key in ("include", "exclude"):
                     if type(value) != list:
                         issues.append("`{0}` must be an array".format(cludes))
+                        continue
+                    for x in value:
+                        if "basePath" in config["files"] and x.startswith('./'):
+                            issues.append('Potentially confusing file path *{0}* with `basePath` set. Consider using *./{0}*'.format(x))
                 else:
                     issues.append("""Unexpected key `{0}` for {project};
                         valid keys are `basePath`, `include` and `exclude`.
