@@ -123,8 +123,12 @@ class INIValidator():
                 issues.append("*{github}* doesn't appear to be a `github` url".format(**ini))
         if "homepage" in ini:
             try:
-                if requests.get(ini["homepage"]).status_code in self.unaccepted_status_codes:
+                # 47
+                status = requests.get(ini["homepage"], verify=False).status_code
+                if status in self.unaccepted_status_codes:
                     issues.append("Couldn't retrieve `homepage` website [{homepage}]({homepage})".format(**ini))
+            except Exception, e:
+                issues.append(str(e))
             except Exception, e:
                 issues.append(str(e))
         else:
