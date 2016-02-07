@@ -61,7 +61,7 @@ class CodeValidator():
                 continue
 
             if file["contents"].strip() == "":
-                issues.append("Why is *{name}* an empty file?")
+                issues.append("Why is *{name}* an empty file?".format(**file))
 
             if file["extension"] != ".js" and file["extension"] != ".css":
                 continue
