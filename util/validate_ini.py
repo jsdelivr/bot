@@ -13,6 +13,10 @@ def read_ini(contents):
             result[prop] = val
     return result
 
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1'
+}
+
 class INIValidator():
     required_fields = ["author", "description", "mainfile"]
     optional_fields = ["github", "homepage"]
@@ -124,7 +128,7 @@ class INIValidator():
         if "homepage" in ini:
             try:
                 # 47
-                status = requests.get(ini["homepage"], verify=False).status_code
+                status = requests.get(ini["homepage"], verify=False, headers=headers).status_code
                 if status in self.unaccepted_status_codes:
                     issues.append("Couldn't retrieve `homepage` website [{homepage}]({homepage})".format(**ini))
             except Exception, e:
