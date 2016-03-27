@@ -53,8 +53,11 @@ class CodeValidator():
                 issues.append("*{extension}* (on *{name}*) seems odd to want to host?".format(**file))
                 continue
             elif file["contents"] is None:
-                if self.valid_extensions.get(file["extension"]) != True:
-                    issues.append("Expected *{name}* to be static content; found binary".format(**file))
+                # Disabled this chekc due to unreliable detection of file size changes in the github pull
+                # request api. Static files with additions will sometimes have 0 changes despite clearly being
+                # changed in large PRs. See #55
+                    # if self.valid_extensions.get(file["extension"]) != True:
+                    #     issues.append("Expected *{name}* to be static content; found binary".format(**file))
                 continue #binary file
             elif self.valid_extensions.get(file["extension"]) != False:
                 issues.append("Expected *{name}* to be binary content; found text".format(**file))
