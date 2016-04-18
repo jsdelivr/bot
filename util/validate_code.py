@@ -70,8 +70,9 @@ class CodeValidator():
                 continue
             
             if re.search(r"\bmin\b", file["name"]):
-                #warn if more than 10 lines in "minimized" file
-                if len(file["contents"].splitlines(True)) > 100:
+                #warn if more than 20 lines and the average line width is not long
+                l = file["contents"].splitlines(True)
+                if len(l) >= 20 and (sum(len(r) for r in l) / len(l)) <= 200:
                     issues.append("Is {name} ({version}) properly minimized?".format(**file))
 
             for test in self.warn_statements:
