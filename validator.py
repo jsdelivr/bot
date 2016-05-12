@@ -69,10 +69,15 @@ class PullBot(PullValidator, GitMerger):
             message = "Automatic validation encountered an error" if status.error_occured else "Failed automatic validation"
             self.repo.create_status(sha=last_commit.sha, state=state, target_url=gist.html_url, description=message)
 
+            if (debug):
+                print comments_md
+
             #create a comment if nothings happening
             if not any(c.user.login == self.config["user"] for c in issue.iter_comments()):
                 issue.create_comment(comments_md)
         else:
+            if (debug == True):
+                print 'Validation success'
             #success status and attempt to merge it
             self.repo.create_status(sha=last_commit.sha, state="success", target_url="http://www.lgtm.in/g", description="\"LGTM\" - bot")
             self.merge(pr)
