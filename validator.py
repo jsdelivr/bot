@@ -82,6 +82,16 @@ class PullBot(PullValidator, GitMerger):
             self.repo.create_status(sha=last_commit.sha, state="success", target_url="http://www.lgtm.in/g", description="\"LGTM\" - bot")
             self.merge(pr)
 
+    def delete_branch(self, pr):
+        r = self.gh.repository(*pr.head.repo)
+        r.ref('heads/' + pr.head.ref).delete()
+
+    # Automatically close branches on bot pull requests when rejected.
+    def closed_pr(self, pr):
+        pr = self.get_pull(pr)
+        if (self.gh.user() == pr.user):
+            self.delete_branch(pr)
+
     def merge(self, pr):
         # only merge trusted users
         if pr.user.login in self.config["trusted_users"]:
@@ -89,6 +99,5 @@ class PullBot(PullValidator, GitMerger):
             try:
                 pr.merge("http://www.lgtm.in/g")
                 # Until https://github.com/sigmavirus24/github3.py/pull/351 is sorted out
-                r = self.gh.repository(*pr.head.repo)
-                r.ref('heads/' + pr.head.ref).delete()
+                self.delete_branch(pr)
             except: pass

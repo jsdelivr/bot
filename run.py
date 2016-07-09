@@ -8,9 +8,13 @@ from blinker import signal
 jimaek = validator.PullBot()
 
 def on_pull(data):
-    if data.get("action", None) in ("opened", "reopened", "synchronize"):
+    action = data.get("action", None)
+    num = int(data.get("number", None))
+    if action in ("opened", "reopened", "synchronize"):
         # print "Validating pr {number}".format(**data)
-        jimaek.validate(int(data.get("number", None)))
+        jimaek.validate(num)
+    elif action == "closed":
+        jimaek.closed_pr(num)
 
 def on_comment(data):
     number = data["issue"]["number"]
