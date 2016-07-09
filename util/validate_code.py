@@ -47,9 +47,11 @@ class CodeValidator():
         issues = []
 
         for file in files:
+            is_fresh = self.is_fresh_project(file['project'])
+
             if file["name"] == "mainfile" and file["extension"] == "":
                 continue
-            if file["extension"] not in self.valid_extensions:
+            if is_fresh and file["extension"] not in self.valid_extensions:
                 issues.append("*{extension}* (on *{name}*) seems odd to want to host?".format(**file))
                 continue
             elif file["contents"] is None:

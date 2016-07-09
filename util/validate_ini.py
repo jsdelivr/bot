@@ -143,6 +143,8 @@ class INIValidator():
         #https://github.com/jsdelivr/api/issues/33
         mainfiles = [mainfile for key,mainfile in ini.iteritems() if key.startswith("mainfile") and mainfile is not None]
         files = self.get_library_files(new_version=changed_files, old_versions=assets)
-        issues += self.validate_mainfile(mainfiles, files=files, project=project_name)
+
+        if not self.is_fresh_project(project_name):
+            issues += self.validate_mainfile(mainfiles, files=files, project=project_name)
 
         return issues

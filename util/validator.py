@@ -7,6 +7,7 @@ from os import path
 import re
 
 import requests
+from wraptor.decorators import memoize
 
 class ValidationState:
     def __init__(self, **entries): 
@@ -27,6 +28,17 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator, UpdateJSONVal
         """
         data = requests.get("http://api.jsdelivr.com/v1/jsdelivr/libraries/{0}".format(project)).json()
         return data[0] if len(data) != 0 and type(data[0]) == dict else None
+
+    # 5 minute memoize cache flush period
+    @memoize(timeout=300e3, instance_method=True)
+    def is_fresh_project(self, project):
+        """
+        Determine whether a project has any previous versions. This is useful for several
+        features that only want to validate the original file set.
+        """
+        p = self.get_project(project)
+        return p == None or type(p['lastversion']) != str 
+
 
     def validate(self, pr, debug=False):
         """
