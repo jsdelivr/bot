@@ -22,6 +22,7 @@ class CodeValidator():
         ".js": False,
         ".map": False,
 
+
         #flash
         ".png": True,
         ".jpg": True,
@@ -37,6 +38,7 @@ class CodeValidator():
         ".ttf": True,
         ".woff": True,
         ".woff2": True,
+        ".cur": True,
 
         #etc
         ".svg": False,
@@ -51,7 +53,7 @@ class CodeValidator():
 
             if file["name"] == "mainfile" and file["extension"] == "":
                 continue
-            if is_fresh and file["extension"] not in self.valid_extensions:
+            if is_fresh and file["extension"].lower() not in self.valid_extensions:
                 issues.append("*{extension}* (on *{name}*) seems odd to want to host?".format(**file))
                 continue
             elif file["contents"] is None:
