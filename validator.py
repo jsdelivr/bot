@@ -82,6 +82,9 @@ class PullBot(PullValidator, GitMerger):
             self.repo.create_status(sha=last_commit.sha, state="success", target_url="http://www.lgtm.in/g", description="\"LGTM\" - bot")
             self.merge(pr)
 
+    def is_trusted(self, user):
+        return user.login in self.config["trusted_users"]
+
     def delete_branch(self, pr):
         r = self.gh.repository(*pr.head.repo)
         r.ref('heads/' + pr.head.ref).delete()
@@ -94,7 +97,7 @@ class PullBot(PullValidator, GitMerger):
 
     def merge(self, pr):
         # only merge trusted users
-        if pr.user.login in self.config["trusted_users"]:
+        if self.is_trusted(pr.user):
             # Attempt to delete the branch (if the bot has permission for the repo)
             try:
                 pr.merge("http://www.lgtm.in/g")

@@ -15,3 +15,6 @@ repo_remote: origin
 # Users to auto merge prs from
 trusted_users:
   - jsdelivrbot
+
+# how often to recheck unvalidated packages
+recheck_interval: 2 hour

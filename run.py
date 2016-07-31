@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import server, validator
+import server, validator, revalidation_service
 import os
 
 from blinker import signal
@@ -26,6 +26,8 @@ def on_comment(data):
 
 signal("pull_event").connect(on_pull)
 signal("comment_event").connect(on_comment)
+
+revalidation_service.start(jimaek)
 
 DEFAULT_PORT = int(os.environ.get("PORT", 9000))
 server.start(DEFAULT_PORT)
