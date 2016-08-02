@@ -15,9 +15,9 @@ def start_timer(bot, interval):
     t = Timer(interval, check_all_open_prs, (bot, interval))
     t.start()
 
-def check_all_open_prs(bot, interval):
+def check_all_open_prs(bot, interval=None):
     print 'Revalidation begining on select open pull requests'
     for pr in bot.repo.iter_pulls(state='open'):
         if bot.is_trusted(pr.user):
             bot.validate(pr)
-    start_timer(bot, interval)
+    if interval is not None: start_timer(bot, interval)

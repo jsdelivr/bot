@@ -1,7 +1,7 @@
 #!/usr/bin/python 
 
 from optparse import OptionParser
-import validator
+import validator, revalidation_service
 
 parser = OptionParser()
 parser.add_option("-v", "--verbose",
@@ -10,9 +10,12 @@ parser.add_option("-v", "--verbose",
 
 (options, args) = parser.parse_args()
 
-if len(args) == 1 and args[0].isdigit():
+if len(args) == 1:
     jimaek = validator.PullBot()
-    jimaek.validate(int(args[0]), options.verbose)
+    if args[0] == 'all':
+      revalidation_service.check_all_open_prs(jimaek)
+    else:
+      jimaek.validate(int(args[0]), options.verbose)
     print 'LGTM'
 else:
     print "Format: $ cli <pr> --verbose=false"
