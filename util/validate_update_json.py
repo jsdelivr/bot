@@ -20,7 +20,7 @@ class UpdateJSONValidator():
 
             if "files" not in config or type(config["files"]) != dict:
                 issues.append("Missing files to include for update.json in {project}".format(**schema))
-                raise
+                return issues
             
             for key, value in config["files"].iteritems():
                 if key == "basePath":
