@@ -127,11 +127,14 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator, UpdateJSONVal
             else:
                 warnings.append("Unexpected file, *{0}*".format(pr_file.filename))
 
-
         checked = {}
         ini_issues = []
         for project_name, project in project_grouped.iteritems():
             checked[project_name] = True
+
+            # Don't bother revalidating ini files if its a bot pull request
+            if self.is_trusted(pr.user): continue
+
             try:
                 ini_issues += self.validate_ini(ini_files.get(project_name, None), changed_files=project, project_name=project_name, owner_repo=owner_repo, ref=ref)
             except Exception,e:
