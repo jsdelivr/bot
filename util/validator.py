@@ -153,7 +153,9 @@ class PullValidator(INIValidator, CodeValidator, VersionValidator, UpdateJSONVal
                     ini_issues.append("Failed to validate {0}: {1}".format(project_name, str(e)))
 
         try:
-            code_issues = self.validate_code(code_files)
+            # Don't bother checking code bugs if bot pull request
+            code_issues = self.validate_code(code_files) if not self.is_trusted(pr.user) else []
+
         except Exception,e:
             if debug == True: raise
             errored_out = True
