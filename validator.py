@@ -87,7 +87,9 @@ class PullBot(PullValidator, GitMerger):
 
     def delete_branch(self, pr):
         r = self.gh.repository(*pr.head.repo)
-        r.ref('heads/' + pr.head.ref).delete()
+        try:
+            r.ref('heads/' + pr.head.ref).delete()
+        except: pass
 
     # Automatically close branches on bot pull requests when rejected.
     def closed_pr(self, pr):
