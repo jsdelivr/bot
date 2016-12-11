@@ -38,8 +38,36 @@ class UpdateJSONValidator():
                         valid keys are `basePath`, `include` and `exclude`.
                     """.format(key, **schema))
 
+            # Validate the linked repo looks
+            if config["packageManager"] == "github":
+                issues += self.check_gh_repo_schema(config)
+
             # Validate files exist... maybe later
         except Exception,e:
             issues.append("Issues validating *update.json* for {project}: {0}".format(e, **schema))
+
+        return issues
+
+    def check_gh_repo_schema(self, config):
+        split = config["repo"].split("/", 1)
+        if len(split) != 2:
+            return ["`repo` for Github must be in the format <user>/<repo>"]
+        gh_user, gh_repo = split
+
+        repo = self.gh.repository(gh_user, gh_repo)
+
+        if repo is None:
+            return ["Could not find repo `%s`" % config["repo"]]
+
+        issues = []
+
+        if next(repo.iter_tags(), None) is None:
+            tags_url = "https://github.com/{repo}/tags".format(**config)
+            warning = ("The repository appears to have no tagged versions (%s).\n"
+                "See [Github Creating Releases](https://help.github.com/articles/creating-releases/) "
+                "or [Git tagging basics](https://git-scm.com/book/en/v2/Git-Basics-Tagging). "
+                "Auto updating of the library will only take place when `tags` are created."
+            ) % (tags_url)
+            issues.append(warning)
 
         return issues
