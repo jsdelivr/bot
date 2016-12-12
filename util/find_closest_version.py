@@ -5,7 +5,7 @@ bad_patch_re = re.compile(r"(\d)([A-Za-z])$") # 0.1.2b instead of 0.1.2-b >.<
 
 def semver(version):
     try:
-        _version = version + ".1" if len(version.split(".")) == 2 else version #fix 0.1 throwing exception
+        _version = version + ".0" if len(version.split(".")) == 2 else version #fix 0.1 throwing exception
         _version = bad_patch_re.sub(r"\1-\2", _version)
         return Version(_version)
     except ValueError:
