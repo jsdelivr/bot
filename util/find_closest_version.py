@@ -9,7 +9,7 @@ def semver(version):
         _version = bad_patch_re.sub(r"\1-\2", _version)
         return Version(_version)
     except ValueError:
-        return version #non semver e.g. soundmanger2
+        return Version("0.0.0-%s" % version) # non semver compatible versions parse as pre-releases
 
 def closest_version(haystack, needle, key):
     """
